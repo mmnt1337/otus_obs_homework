@@ -1,0 +1,67 @@
+services:
+  db:
+    # We use a mariadb image which supports both amd64 & arm64 architecture
+    image: mariadb:10.6.4-focal
+    # If you really want to use MySQL, uncomment the following line
+    #image: mysql:8.0.27
+    command: 
+      - '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=*
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=*
+      - MYSQL_PASSWORD=*
+    expose:
+      - 3306
+      - 33060
+      
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - 80:80
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST=*
+      - WORDPRESS_DB_USER=*
+      - WORDPRESS_DB_PASSWORD=*
+      - WORDPRESS_DB_NAME=*
+    volumes:
+      - ./wordpress:/var/www/html
+
+  sql_exporter:
+    image: prom/mysqld-exporter
+    volumes:
+      - ./sql_exporter.cnf:/home/otus/.my.cnf
+    ports:
+      - 9104:9104
+    command: 
+      - --config.my-cnf=/home/otus/.my.cnf
+    environment:
+      - DATA_SOURCE_NAME="root:somewordpress@mysql:3306/database"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  black_box_exporter:
+    image: prom/blackbox-exporter
+    ports:
+      - 9115:9115
+
+  node_exporter:
+    image: prom/node-exporter
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+      - 9100:9100
+
+volumes:
+  db_data:
