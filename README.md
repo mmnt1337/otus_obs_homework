@@ -16,6 +16,6 @@ P.S. Файл конфигурации docker-compose приложил.
 # **GAP-2**
 1. Установил и настроил grafana.
 2. Через UI графаны создал папки и дашборды.
-   2.1 Добавил Prometheus в качестве datasource. 
-   2.2 Настроил и подогнал дашборд node exporter для infra.
-   2.3 Так же настроил дашборды ДБ и Blackbox exporter в качестве мониторинга app.
+3. Добавил Prometheus в качестве datasource. 
+4. Настроил и подогнал дашборд node exporter для infra.
+5. Так же настроил дашборды ДБ и Blackbox exporter в качестве мониторинга app.
