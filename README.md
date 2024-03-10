@@ -19,3 +19,12 @@ P.S. Файл конфигурации docker-compose приложил.
 3. Добавил Prometheus в качестве datasource. 
 4. Настроил и подогнал дашборд node exporter для infra.
 5. Так же настроил дашборды ДБ и Blackbox exporter в качестве мониторинга app.
+
+# **ДЗ 5**
+1. Установил zabbix-agent и настроил - добавил юзер параметры, лежат в файле _zabbix_agentd.conf_
+2. Написал скрипты metrics.sh и discovery.sh, первый генерирует рандомные метрики от 1 до 100, второй выводит эти метрики в JSON.
+3. Настроил Discovery rule в zabbix, внутри которого настроил item и trigger prototype.
+4. Создал бота в тг: @otus_obs_homework_alert_bot
+5. В заббиксе настроил и включил Media type - telegram - добавил токен бота. Так же настроил пользователя Admin - включил оповещения и добавил id чата в поле Send To.
+
+Скриншоты приложил.
