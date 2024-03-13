@@ -1,0 +1,25 @@
+route:
+  receiver: 'alertmanager-bot'
+  group_by: [ alertname ]
+
+  routes:
+    - matchers:
+      - severity="critical"
+      receiver: 'alertmanager-bot'
+
+    - matchers:
+      - severity="warning"
+      receiver: 'alertmanager-smtp'
+
+receivers:
+- name: 'alertmanager-bot'
+  webhook_configs:
+  - send_resolved: true
+    url: 'http://alertmanager-bot:8080'
+
+- name: 'alertmanager-smtp'
+  email_configs:
+  - to: 'alexey57062@gmail.com'
+    from: 'alert@otushomework.net'
+    smarthost: 'mailhog:1025'
+    require_tls: false
