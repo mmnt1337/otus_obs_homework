@@ -1,0 +1,14 @@
+sources:
+  auth_log_source:
+    type: "file"
+    include:
+      - "/var/log/auth.log"
+    start_at_beginning: true
+
+sinks:
+  elastic:
+    type: elasticsearch
+    inputs:
+      - auth_log_source
+    endpoints:
+      - http://elasticsearch:9200

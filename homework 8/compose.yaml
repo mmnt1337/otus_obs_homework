@@ -1,0 +1,9 @@
+  vector:
+    image: timberio/vector:latest-alpine
+    environment:
+      - VECTOR_LOG = debug 
+    volumes:
+      - ./vector.yaml:/etc/vector/vector.yaml
+      - /var/log/auth.log:/var/log/auth.log:ro
+    depends_on:
+      - logstash
