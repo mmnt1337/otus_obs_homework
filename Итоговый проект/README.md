@@ -1,11 +1,54 @@
 
+# Итоговый проект otus observability 
+
+## Подготовка к запуску
+
+Для запуска сервисов нужно выдать права на файлы и папки:
+ 1. Сервисы beats:
+```bash
+sudo chmod go-w metricbeat.yml heartbeat.yml 
+```
+ 2. Папка grafana/:
+ ```bash
+ mkdir grafana
+ sudo chmod -R g+w grafana/
+ ```
+## Запуск
+
+В директории с compose.yaml выполнить:
+```bash
+docker compose up -d
+```
+
+Дождаться запуска всех сервисов, проверить статус:
+```bash
+docker ps
+```
+
+Сервисы доступны на портах:
+
+```
+wordpress:80
+db:3306 (MySQL)
+prometheus:9090
+alertmanager:9093
+mailhog:8025 (1025 smtp)
+victoriametrics:8428
+grafana:3000
+nodeexporter:9100
+mysqld-exporter:9104
+elasticsearch:9200
+kibana:5601
+```
+
+
+
 ## Настройка сервисов
 
 ### Docker Compose
+*./compose.yaml*
 Подключение к сервисам происходит по названию контейнера при условии сетевой доступности (указываем порты, по которым будут доступны сервисы). Например, myapp:3000
 Для изменения портов на которых запускается сервис редактировать пункт **ports**:
-
-*./compose.yaml*
 ```yaml
   myapp:
 ...
@@ -45,7 +88,6 @@
 
 ### Prometheus
 В файле **prometheus.yml** указаны настройки прометеус
-
 *./prometheus.yml*
 ```yaml
 global: # Глобальные настройки сервиса, которые применяются, если не указать других
@@ -87,7 +129,6 @@ scrape_configs: # Настройки сбора данных, откуда и к
 ```
 ### Экспортеры Prometheus:
 ***MySQL exporter***
-
 *./sql_exporter.cnf*
 ```yaml
 [client]
@@ -181,7 +222,6 @@ output.elasticsearch: # указываем выводы, куда heartbeat бу
 Использую вектор для выгрузки логов WordPress из Docker так как сам WP автоматически логи не генерирует
 Пришлось отсечь все поля, кроме message из логов из-за бага в elasticsearch из-за которого он не может обработать поля с глубиной 
 https://github.com/vectordotdev/vector/issues/5881
-
 *./vector.yaml*
 ```yaml
 sources: # задаем источники логов или метрик
