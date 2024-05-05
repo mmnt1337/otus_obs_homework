@@ -15,9 +15,9 @@ receivers:
 - name: 'telegram'
   telegram_configs:
     - api_url: https://api.telegram.org
-      bot_token: '7013824454:AAHoohhT_Nvszv-Qy6jh7LKzrh3oZXp1rvA'
+      bot_token: '*****'
       send_resolved: true
-      chat_id: 6288296528
+      chat_id: ******
 
 - name: 'mail'
   email_configs:
