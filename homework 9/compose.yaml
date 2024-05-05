@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./promtail:/etc/promtail
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
