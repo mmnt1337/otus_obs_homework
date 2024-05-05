@@ -1,0 +1,29 @@
+groups: 
+- name: NodeExporter 
+  rules:
+  - alert: NodeExporter is down
+    expr: up{job="node_exporter"} == 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: NodeExporter не отвечает (instance {{ $labels.instance }})
+
+  - alert: HostHighCpuLoad
+    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 40
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Выросла нагрузка на CPU (instance {{ $labels.instance }})
+      description: CPU load is > 40%\n  VALUE = {{ $value }}
+
+- name: MySQL 
+  rules:
+  - alert: MySQL is down
+    expr: up{job="sql_db"} == 0
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: MySQL не отвечает

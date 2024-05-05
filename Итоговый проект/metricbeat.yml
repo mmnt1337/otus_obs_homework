@@ -1,0 +1,9 @@
+metricbeat.modules:
+- module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]

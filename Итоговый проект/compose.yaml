@@ -1,0 +1,150 @@
+version: '3.7'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DEBUG: 1
+    volumes:
+      - ./wordpress:/var/www/html
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - 3306:3306
+  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert.rules:/etc/prometheus/alert.rules
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+
+  alertmanager:
+    image: prom/alertmanager
+    user: root
+    container_name: alertmanager
+    hostname: alertmanager
+    environment:
+      TZ: "Europe/Moscow"
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--log.level=debug'
+      
+  mailhog:
+    image: mailhog/mailhog:v1.0.0
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics
+    command: -storageDataPath=/victoria-metrics-data
+    volumes:
+      - ./vm_data:/victoria-metrics-data
+    ports:
+      - 8428:8428
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+
+  nodeexporter:
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc
+      - /sys:/host/sys
+      - /:/rootfs
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - 9100:9100
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter
+    volumes:
+      - ./sql_exporter.cnf:/.my.cnf
+    command: 
+      - --config.my-cnf=.my.cnf
+    ports:
+      - 9104:9104
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - discovery.type=single-node
+      - http.max_content_length=2000mb
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.1
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+  heartbeat:
+    image: docker.elastic.co/beats/heartbeat:7.10.1
+    volumes:
+      - ./heartbeat.yml:/usr/share/heartbeat/heartbeat.yml:ro
+    depends_on:
+      - elasticsearch
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.10.1
+    volumes:
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+    depends_on:
+      - elasticsearch
+
+  vector:
+    image: timberio/vector:latest-alpine
+    environment:
+      - VECTOR_LOG = debug 
+    volumes:
+      - ./file.log:/etc/vector/file.log
+      - ./vector.yaml:/etc/vector/vector.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - elasticsearch
+
+volumes:
+  wordpress:
+  db:
+  elasticsearch:

@@ -1,0 +1,31 @@
+sources:
+  docker_logs:
+    type: docker_logs
+    auto_partial_merge: true
+    host_key: host
+    include_images:
+      - wordpress
+
+
+transforms:
+  parse_logs:
+    type: "remap"
+    inputs: ["docker_logs"]
+    source: . = parse_key_value!(.message)
+
+
+sinks:
+  elastic:
+    type: elasticsearch
+    inputs:
+      - parse_logs
+    endpoints:
+      - http://elasticsearch:9200
+
+  file:
+    type: file
+    inputs:
+      - docker_logs
+    path: "/etc/vector/file.log"
+    encoding:
+      codec: json

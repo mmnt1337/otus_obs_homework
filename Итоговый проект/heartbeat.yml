@@ -1,0 +1,15 @@
+heartbeat.monitors:
+- type: http
+  name: "Google"
+  enabled: true
+  schedule: '@every 10s' 
+  urls: ["https://www.google.com"]
+
+- type: http
+  name: "Bing"
+  enabled: true
+  schedule: '@every 10s'
+  urls: ["https://www.otus.ru"]
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
